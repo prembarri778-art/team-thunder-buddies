@@ -359,6 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Populate Roadmap
                 divRoadmap.innerHTML = '';
+                const fragment = document.createDocumentFragment();
                 report.roadmap.forEach(step => {
                     const stepDiv = document.createElement('div');
                     stepDiv.className = 'roadmap-step';
@@ -366,8 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="roadmap-title">${step.title}</div>
                         <div class="roadmap-desc">${step.desc}</div>
                     `;
-                    divRoadmap.appendChild(stepDiv);
+                    fragment.appendChild(stepDiv);
                 });
+                divRoadmap.appendChild(fragment);
 
                 aiReportLoading.style.display = 'none';
                 aiReportContent.style.display = 'block';

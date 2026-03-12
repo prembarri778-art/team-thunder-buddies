@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Perf Test</title>
+</head>
+<body>
+<div id="report-roadmap"></div>
+<script>
+    const divRoadmap = document.getElementById('report-roadmap');
+    const report = {
+        roadmap: []
+    };
+    for (let i = 0; i < 1000; i++) {
+        report.roadmap.push({ title: 'Step ' + i, desc: 'Description ' + i });
+    }
+
+    // Baseline
+    const startBaseline = performance.now();
+    divRoadmap.innerHTML = '';
+    report.roadmap.forEach(step => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'roadmap-step';
+        stepDiv.innerHTML = `
+            <div class="roadmap-title">${step.title}</div>
+            <div class="roadmap-desc">${step.desc}</div>
+        `;
+        divRoadmap.appendChild(stepDiv);
+    });
+    // Force layout calculation
+    divRoadmap.offsetHeight;
+    const endBaseline = performance.now();
+
+    // Optimized
+    const startOptimized = performance.now();
+    divRoadmap.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    report.roadmap.forEach(step => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'roadmap-step';
+        stepDiv.innerHTML = `
+            <div class="roadmap-title">${step.title}</div>
+            <div class="roadmap-desc">${step.desc}</div>
+        `;
+        fragment.appendChild(stepDiv);
+    });
+    divRoadmap.appendChild(fragment);
+    // Force layout calculation
+    divRoadmap.offsetHeight;
+    const endOptimized = performance.now();
+
+    console.log(`Baseline: ${endBaseline - startBaseline}ms`);
+    console.log(`Optimized: ${endOptimized - startOptimized}ms`);
+</script>
+</body>
+</html>
