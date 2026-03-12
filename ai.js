@@ -1,6 +1,7 @@
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_API_KEY = "YOUR_GROQ_API_KEY_HERE";
 const MODEL = "llama-3.1-8b-instant";
+const CHAT_MODEL = "llama-3.3-70b-versatile";
 
 function getApiKey() {
     return localStorage.getItem('yuvata_groq_key') || DEFAULT_API_KEY;
@@ -140,7 +141,7 @@ Output ONLY valid JSON.`;
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile", // Use a smarter model for chat if available, or stick to 8b
+                    model: CHAT_MODEL, // Use a smarter model for chat if available, or stick to 8b
                     messages: messages,
                     temperature: 0.7,
                     max_tokens: 250
