@@ -1,0 +1,21 @@
+{
+    "name": "YUVATA Digital Literacy",
+    "short_name": "YUVATA",
+    "description": "AI-powered digital literacy assessment platform for the new generation.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#030014",
+    "theme_color": "#030014",
+    "icons": [
+        {
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/512px-Angular_full_color_logo.svg.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/512px-Angular_full_color_logo.svg.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
