@@ -795,6 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         historyList.innerHTML = '';
+        const fragment = document.createDocumentFragment();
         assessments.forEach(a => {
             const date = new Date(a.created_at).toLocaleDateString('en-IN', {
                 day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -821,8 +822,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="history-level-emoji" title="${levelName}">${emoji}</span>
                 </div>
             `;
-            historyList.appendChild(card);
+            fragment.appendChild(card);
         });
+        historyList.appendChild(fragment);
     }
 
     // =========================================
