@@ -41,7 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = {
         hero: document.getElementById('view-hero'),
         skills: document.getElementById('view-skills'),
-        loading: document.getElementById('view-loading')
+        loading: document.getElementById('view-loading'),
+        assessment: document.getElementById('view-assessment'),
+        results: document.getElementById('view-results')
     };
     
     const btns = {
@@ -54,6 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const countDisplay = document.getElementById('count-display');
     const bottomBar = document.querySelector('.bottom-action-bar');
     const loadingSubtitle = document.getElementById('loading-subtitle');
+
+    // --- Supabase: Session ID for this assessment run ---
+    let currentSessionId = null;
 
     let selectedSkills = new Set();
     const loadingTexts = [
@@ -156,6 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomBar.classList.remove('visible');
         switchView(views.skills, views.loading);
 
+        // Generate a unique session ID for this assessment
+        currentSessionId = YuvataDB.generateSessionId();
+
         let textIndex = 0;
         const textInterval = setInterval(() => {
             textIndex = (textIndex + 1) % loadingTexts.length;
@@ -171,17 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
         Array.from(selectedSkills).forEach(skill => {
             const skillQs = MOCK_DB[skill];
             if (skillQs) {
-                // Shuffle questions for this skill to ensure variety
                 const shuffled = [...skillQs].sort(() => 0.5 - Math.random());
-                // Pick up to 2 random questions per selected category for the demo
                 const selected = shuffled.slice(0, 2).map(q => ({...q, skillCategory: skill})); 
                 currentQuestions = currentQuestions.concat(selected);
             }
         });
         
-        // Final shuffle of the whole set
         currentQuestions.sort(() => 0.5 - Math.random());
-        
         currentQuestionIndex = 0;
         userAnswers = [];
 
@@ -266,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Calculate Scores
         let correctCount = 0;
-        const skillScores = {}; // { 'online-safety': { total: 2, correct: 1 }, ... }
+        const skillScores = {};
         
         userAnswers.forEach(ans => {
             if (ans.isCorrect) correctCount++;
@@ -280,40 +284,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const overallScorePct = Math.round((correctCount / currentQuestions.length) * 100);
         
+        // Determine literacy level
+        let literacyLevel = 'novice';
+        let levelName = 'Digital Novice';
+        let levelIcon = '🌱';
+        let levelBg = '';
+        let levelBorderColor = '';
+
+        if (overallScorePct >= 90) {
+            literacyLevel = 'champion';
+            levelName = 'Digital Champion';
+            levelIcon = '👑';
+            levelBg = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.1))';
+            levelBorderColor = 'var(--color-teal)';
+        } else if (overallScorePct >= 70) {
+            literacyLevel = 'native';
+            levelName = 'Digital Native';
+            levelIcon = '🛡️';
+            levelBg = 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.1))';
+            levelBorderColor = 'var(--color-blue)';
+        } else if (overallScorePct >= 40) {
+            literacyLevel = 'explorer';
+            levelName = 'Digital Explorer';
+            levelIcon = '🧭';
+            levelBg = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(249, 115, 22, 0.1))';
+            levelBorderColor = 'var(--color-orange)';
+        } else {
+            levelBg = 'linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(225, 29, 72, 0.1))';
+            levelBorderColor = 'var(--color-red)';
+        }
+
         // Update DOM
         document.getElementById('final-score').textContent = `${overallScorePct}%`;
-        
-        // Circular Progress CSS hack
         document.querySelector('.circular-progress').style.setProperty('--progress', overallScorePct);
         
         const levelBadgeText = document.getElementById('final-level-text');
-        const levelBadgeIcon = document.querySelector('.level-icon');
+        const levelBadgeIconEl = document.querySelector('.level-icon');
         const levelBadge = document.getElementById('final-level-badge');
         
-        if (overallScorePct >= 90) {
-            levelBadgeText.textContent = "Digital Champion";
-            levelBadgeIcon.textContent = "👑";
-            levelBadge.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.1))";
-            levelBadge.style.borderColor = "var(--color-teal)";
-        } else if (overallScorePct >= 70) {
-            levelBadgeText.textContent = "Digital Native";
-            levelBadgeIcon.textContent = "🛡️";
-            levelBadge.style.background = "linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.1))";
-            levelBadge.style.borderColor = "var(--color-blue)";
-        } else if (overallScorePct >= 40) {
-            levelBadgeText.textContent = "Digital Explorer";
-            levelBadgeIcon.textContent = "🧭";
-            levelBadge.style.background = "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(249, 115, 22, 0.1))";
-            levelBadge.style.borderColor = "var(--color-orange)";
-        } else {
-            levelBadgeText.textContent = "Digital Novice";
-            levelBadgeIcon.textContent = "🌱";
-            levelBadge.style.background = "linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(225, 29, 72, 0.1))";
-            levelBadge.style.borderColor = "var(--color-red)";
-        }
+        levelBadgeText.textContent = levelName;
+        levelBadgeIconEl.textContent = levelIcon;
+        levelBadge.style.background = levelBg;
+        levelBadge.style.borderColor = levelBorderColor;
 
         // Render Radar Chart
         initRadarChart(skillScores);
+
+        // --- SUPABASE: Save assessment to DB ---
+        if (YuvataAuth.isLoggedIn()) {
+            const scoresForDB = {};
+            Object.keys(skillScores).forEach(k => {
+                scoresForDB[k] = Math.round((skillScores[k].correct / skillScores[k].total) * 100);
+            });
+
+            YuvataDB.saveAssessment({
+                sessionId: currentSessionId,
+                selectedSkills: Array.from(selectedSkills),
+                questions: currentQuestions.map(q => ({ question: q.q, options: q.opts, correct: q.ans, skill: q.skillCategory })),
+                answers: userAnswers,
+                scores: scoresForDB,
+                overallScore: overallScorePct,
+                literacyLevel: literacyLevel
+            }).then(saved => {
+                if (saved) {
+                    console.log('[YUVATA] Assessment saved to cloud ✓');
+                    showSaveStatus();
+                }
+            });
+        }
+    }
+
+    // Show a subtle "Saved to cloud" indicator
+    function showSaveStatus() {
+        const scoreCard = document.querySelector('.score-card');
+        if (!scoreCard) return;
+        let status = scoreCard.querySelector('.save-status');
+        if (!status) {
+            status = document.createElement('div');
+            status.className = 'save-status';
+            status.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Saved to your account
+            `;
+            scoreCard.appendChild(status);
+        }
+        setTimeout(() => status.classList.add('visible'), 500);
     }
 
     let radarChartInstance = null;
@@ -435,6 +490,9 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage(text, true);
         chatInput.value = '';
         
+        // Save user message to Supabase
+        YuvataDB.saveChatMessage('user', text);
+        
         showTypingIndicator();
         
         // Mock AI response
@@ -447,6 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
             const reply = responses[Math.floor(Math.random() * responses.length)];
             appendMessage(reply, false);
+            
+            // Save AI response to Supabase
+            YuvataDB.saveChatMessage('assistant', reply);
         }, 2000);
     }
 
@@ -456,5 +517,238 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') handleChatSubmit();
         });
     }
+
+    // =========================================
+    // --- 11. SUPABASE AUTH UI LOGIC ---
+    // =========================================
+    const btnLogin = document.getElementById('btn-login');
+    const authModal = document.getElementById('auth-modal');
+    const authBackdrop = document.getElementById('auth-backdrop');
+    const btnCloseAuth = document.getElementById('btn-close-auth');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const authFormLogin = document.getElementById('auth-form-login');
+    const authFormSignup = document.getElementById('auth-form-signup');
+    const authErrorLogin = document.getElementById('auth-error-login');
+    const authErrorSignup = document.getElementById('auth-error-signup');
+    const userMenu = document.getElementById('user-menu');
+    const btnUserToggle = document.getElementById('btn-user-toggle');
+    const userDropdown = document.getElementById('user-dropdown');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnMyHistory = document.getElementById('btn-my-history');
+    const userInitial = document.getElementById('user-initial');
+    const userDisplayName = document.getElementById('user-display-name');
+    const dropdownEmail = document.getElementById('dropdown-email');
+
+    // Open/Close Auth Modal
+    function openAuthModal() {
+        authModal.classList.add('visible');
+        authBackdrop.classList.add('visible');
+    }
+
+    function closeAuthModal() {
+        authModal.classList.remove('visible');
+        authBackdrop.classList.remove('visible');
+        authErrorLogin.textContent = '';
+        authErrorSignup.textContent = '';
+    }
+
+    if (btnLogin) btnLogin.addEventListener('click', openAuthModal);
+    if (btnCloseAuth) btnCloseAuth.addEventListener('click', closeAuthModal);
+    if (authBackdrop) authBackdrop.addEventListener('click', closeAuthModal);
+
+    // Auth Tab Switching
+    authTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            authTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const tabName = tab.dataset.authTab;
+            if (tabName === 'login') {
+                authFormLogin.style.display = 'flex';
+                authFormSignup.style.display = 'none';
+            } else {
+                authFormLogin.style.display = 'none';
+                authFormSignup.style.display = 'flex';
+            }
+            authErrorLogin.textContent = '';
+            authErrorSignup.textContent = '';
+        });
+    });
+
+    // Login Form Submit
+    if (authFormLogin) {
+        authFormLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            authErrorLogin.textContent = '';
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const submitBtn = authFormLogin.querySelector('button[type="submit"] span');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Signing in...';
+
+            try {
+                await YuvataAuth.signIn(email, password);
+                closeAuthModal();
+                showToast('Welcome back! 🎉');
+            } catch (err) {
+                authErrorLogin.textContent = err.message || 'Sign in failed. Please try again.';
+            } finally {
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+
+    // Signup Form Submit
+    if (authFormSignup) {
+        authFormSignup.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            authErrorSignup.textContent = '';
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const submitBtn = authFormSignup.querySelector('button[type="submit"] span');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating...';
+
+            try {
+                await YuvataAuth.signUp(email, password, name);
+                closeAuthModal();
+                showToast('Account created! Welcome to YUVATA 🚀');
+            } catch (err) {
+                authErrorSignup.textContent = err.message || 'Sign up failed. Please try again.';
+            } finally {
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+
+    // User Menu Toggle
+    if (btnUserToggle) {
+        btnUserToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', () => {
+        if (userDropdown) userDropdown.classList.remove('open');
+    });
+
+    // Logout
+    if (btnLogout) {
+        btnLogout.addEventListener('click', async () => {
+            userDropdown.classList.remove('open');
+            await YuvataAuth.signOut();
+            showToast('Signed out successfully');
+        });
+    }
+
+    // Update UI based on auth state
+    function updateAuthUI(user) {
+        if (user) {
+            // User is logged in
+            if (btnLogin) btnLogin.style.display = 'none';
+            if (userMenu) userMenu.style.display = 'block';
+            if (userInitial) userInitial.textContent = YuvataAuth.getInitials();
+            if (userDisplayName) userDisplayName.textContent = YuvataAuth.getDisplayName();
+            if (dropdownEmail) dropdownEmail.textContent = user.email;
+        } else {
+            // User is logged out
+            if (btnLogin) btnLogin.style.display = 'inline-flex';
+            if (userMenu) userMenu.style.display = 'none';
+        }
+    }
+
+    // Listen for auth state changes
+    document.addEventListener('yuvata-auth-changed', (e) => {
+        updateAuthUI(e.detail.user);
+    });
+
+    // Toast notification
+    function showToast(message) {
+        let toast = document.querySelector('.auth-success-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'auth-success-toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+
+    // =========================================
+    // --- 12. ASSESSMENT HISTORY ---
+    // =========================================
+    const historyModal = document.getElementById('history-modal');
+    const historyBackdrop = document.getElementById('history-backdrop');
+    const historyList = document.getElementById('history-list');
+    const btnCloseHistory = document.getElementById('btn-close-history');
+
+    function openHistory() {
+        historyModal.classList.add('visible');
+        historyBackdrop.classList.add('visible');
+        loadHistory();
+    }
+
+    function closeHistory() {
+        historyModal.classList.remove('visible');
+        historyBackdrop.classList.remove('visible');
+    }
+
+    if (btnMyHistory) btnMyHistory.addEventListener('click', () => {
+        userDropdown.classList.remove('open');
+        openHistory();
+    });
+    if (btnCloseHistory) btnCloseHistory.addEventListener('click', closeHistory);
+    if (historyBackdrop) historyBackdrop.addEventListener('click', closeHistory);
+
+    async function loadHistory() {
+        historyList.innerHTML = '<p class="text-muted" style="text-align:center;padding:24px;">Loading...</p>';
+        const assessments = await YuvataDB.getAssessments();
+
+        if (assessments.length === 0) {
+            historyList.innerHTML = '<div class="history-empty"><p class="text-muted">No assessments yet. Take your first one!</p></div>';
+            return;
+        }
+
+        historyList.innerHTML = '';
+        assessments.forEach(a => {
+            const date = new Date(a.created_at).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const skills = (a.selected_skills || []).map(s => s.replace('-', ' ')).join(', ');
+            const emoji = a.literacy_level === 'champion' ? '👑' : a.literacy_level === 'native' ? '🛡️' : a.literacy_level === 'explorer' ? '🧭' : '🌱';
+            const levelName = a.literacy_level ? a.literacy_level.charAt(0).toUpperCase() + a.literacy_level.slice(1) : 'N/A';
+            
+            const scoreColor = a.overall_score >= 70 
+                ? 'background: rgba(16, 185, 129, 0.15); color: #34d399;' 
+                : a.overall_score >= 40 
+                ? 'background: rgba(245, 158, 11, 0.15); color: #fbbf24;' 
+                : 'background: rgba(244, 63, 94, 0.15); color: #fb7185;';
+
+            const card = document.createElement('div');
+            card.className = 'history-card';
+            card.innerHTML = `
+                <div class="history-card-info">
+                    <h4>${skills || 'Assessment'}</h4>
+                    <span class="history-date">${date}</span>
+                </div>
+                <div class="history-card-score">
+                    <span class="history-score-badge" style="${scoreColor}">${Math.round(a.overall_score)}%</span>
+                    <span class="history-level-emoji" title="${levelName}">${emoji}</span>
+                </div>
+            `;
+            historyList.appendChild(card);
+        });
+    }
+
+    // =========================================
+    // --- 13. INITIALIZE SUPABASE AUTH ---
+    // =========================================
+    YuvataAuth.init().then(user => {
+        updateAuthUI(user);
+        console.log('[YUVATA] Auth initialized:', user ? 'logged in' : 'anonymous');
+    });
 
 });
