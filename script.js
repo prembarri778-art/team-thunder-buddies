@@ -204,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderQuestion(index) {
         currentSelectedOptionIndex = null;
+        let currentSelectedOptionElem = null;
         btnNextQuestion.disabled = true;
         assessmentActionBar.style.display = 'flex'; // show bar
         
@@ -229,9 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             optElem.addEventListener('click', () => {
                 // Deselect others
-                document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+                if (currentSelectedOptionElem) {
+                    currentSelectedOptionElem.classList.remove('selected');
+                }
                 optElem.classList.add('selected');
                 currentSelectedOptionIndex = i;
+                currentSelectedOptionElem = optElem;
                 btnNextQuestion.disabled = false;
             });
             
