@@ -133,6 +133,24 @@ cd yuvata
 npx serve .
 ```
 
+## 🚀 Deployment (Vercel)
+
+YUVATA is designed to be deployed as a static site. We recommend **Vercel** for its excellent CDN and ease of use.
+
+1.  Push your code to **GitHub**.
+2.  Import the repository into [Vercel](https://vercel.com/new).
+3.  Vercel will automatically detect the static build settings.
+4.  **Important:** After deployment, visit the hosted URL and use the **Settings (⚙️)** menu in the navbar to add your Groq API key.
+
+## ⚙️ Post-Deployment Config
+
+Since the project uses extreme security measures, the **Groq API Key** is not hardcoded in the codebase. 
+
+1.  Visit your live hosted site.
+2.  Click the **Gear Icon (⚙️)** in the top navigation.
+3.  Paste your `gsk_...` key.
+4.  The key is stored in your browser's `localStorage`, making it securely accessible to you without being exposed in the public code.
+
 ### Database Setup (Supabase)
 Run the provided `setup.sql` file in your Supabase SQL Editor to initialize the `profiles`, `assessments`, and `chat_history` tables along with the required Row Level Security policies.
 
