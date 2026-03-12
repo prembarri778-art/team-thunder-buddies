@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentQuestionIndex = 0;
     let userAnswers = []; // Store { qObj, passed: boolean }
 
-    btns.generate.addEventListener('click', () => {
+    btns.generate.addEventListener('click', async () => {
         bottomBar.classList.remove('visible');
         switchView(views.skills, views.loading);
 
@@ -174,27 +174,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         }, 1500);
 
-        // Build unique question set from selected skills
-        currentQuestions = [];
-        Array.from(selectedSkills).forEach(skill => {
-            const skillQs = MOCK_DB[skill];
-            if (skillQs) {
-                const shuffled = [...skillQs].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, 2).map(q => ({...q, skillCategory: skill})); 
-                currentQuestions = currentQuestions.concat(selected);
-            }
-        });
-        
-        currentQuestions.sort(() => 0.5 - Math.random());
-        currentQuestionIndex = 0;
-        userAnswers = [];
-
-        // Mock AI Generation Delay
-        setTimeout(() => {
+        try {
+            // CALL GROQ AI to generate live questions!
+            currentQuestions = await YuvataAI.generateQuestions(Array.from(selectedSkills));
+            
             clearInterval(textInterval);
+            currentQuestionIndex = 0;
+            userAnswers = [];
+
             renderQuestion(0);
             switchView(views.loading, views.assessment); 
-        }, 3000);
+        } catch (error) {
+            clearInterval(textInterval);
+            alert("Failed to generate AI Assessment. Please check your Groq API Key in Settings.\n\n" + error.message);
+            bottomBar.classList.add('visible');
+            switchView(views.loading, views.skills);
+        }
     });
 
     const questionCounter = document.getElementById('question-counter');
@@ -329,6 +324,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render Radar Chart
         initRadarChart(skillScores);
+
+        // Update selected domains text on results
+        document.getElementById('results-domains').textContent = Array.from(selectedSkills).join(', ');
+
+        // --- GROQ AI: Generate Report and Roadmap ---
+        const aiReportLoading = document.getElementById('ai-report-loading');
+        const aiReportContent = document.getElementById('ai-report-content');
+        const ulStrengths = document.getElementById('report-strengths');
+        const ulWeaknesses = document.getElementById('report-weaknesses');
+        const divRoadmap = document.getElementById('report-roadmap');
+        
+        aiReportLoading.style.display = 'flex';
+        aiReportContent.style.display = 'none';
+
+        // Call AI in the background
+        YuvataAI.generateReport(userAnswers, overallScorePct, literacyLevel)
+            .then(report => {
+                // Populate Strengths
+                ulStrengths.innerHTML = '';
+                report.strengths.forEach(s => {
+                    const li = document.createElement('li');
+                    li.textContent = s;
+                    ulStrengths.appendChild(li);
+                });
+
+                // Populate Weaknesses
+                ulWeaknesses.innerHTML = '';
+                report.weaknesses.forEach(w => {
+                    const li = document.createElement('li');
+                    li.textContent = w;
+                    ulWeaknesses.appendChild(li);
+                });
+
+                // Populate Roadmap
+                divRoadmap.innerHTML = '';
+                report.roadmap.forEach(step => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'roadmap-step';
+                    stepDiv.innerHTML = `
+                        <div class="roadmap-title">${step.title}</div>
+                        <div class="roadmap-desc">${step.desc}</div>
+                    `;
+                    divRoadmap.appendChild(stepDiv);
+                });
+
+                aiReportLoading.style.display = 'none';
+                aiReportContent.style.display = 'block';
+            })
+            .catch(err => {
+                console.error(err);
+                aiReportLoading.innerHTML = `<p class="text-muted" style="color:#fb7185;">Failed to generate AI report. Check API Key.</p>`;
+            });
 
         // --- SUPABASE: Save assessment to DB ---
         if (YuvataAuth.isLoggedIn()) {
@@ -483,7 +530,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ind) ind.remove();
     }
 
-    function handleChatSubmit() {
+    let chatHistory = [];
+
+    async function handleChatSubmit() {
         const text = chatInput.value.trim();
         if (!text) return;
         
@@ -492,29 +541,62 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Save user message to Supabase
         YuvataDB.saveChatMessage('user', text);
+        chatHistory.push({ sender: 'user', text: text });
         
         showTypingIndicator();
         
-        // Mock AI response
-        setTimeout(() => {
-            removeTypingIndicator();
-            const responses = [
-                "That's a great question! When viewing suspected deepfakes, always look for unnatural blink rates or slight blurs around the edges of the face/mouth.",
-                "Yes, using a password manager is highly recommended. It saves you from reusing passwords and creating a single point of failure.",
-                "Absolutely. I can also generate a custom reading list for you if you want to dive deeper into privacy laws like GDPR."
-            ];
-            const reply = responses[Math.floor(Math.random() * responses.length)];
-            appendMessage(reply, false);
-            
-            // Save AI response to Supabase
-            YuvataDB.saveChatMessage('assistant', reply);
-        }, 2000);
+        // Call GROQ AI
+        const reply = await YuvataAI.chatWithMentor(chatHistory);
+        
+        removeTypingIndicator();
+        appendMessage(reply, false);
+        
+        // Save AI response
+        YuvataDB.saveChatMessage('assistant', reply);
+        chatHistory.push({ sender: 'assistant', text: reply });
     }
 
     if (btnSendMessage) btnSendMessage.addEventListener('click', handleChatSubmit);
     if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleChatSubmit();
+        });
+    }
+
+    // =========================================
+    // --- 10.5. API SETTINGS LOGIC ---
+    // =========================================
+    const btnApiSettings = document.getElementById('btn-api-settings');
+    const settingsModal = document.getElementById('settings-modal');
+    const settingsBackdrop = document.getElementById('settings-backdrop');
+    const inputApiKey = document.getElementById('settings-api-key');
+    const btnSaveSettings = document.getElementById('btn-save-settings');
+    const btnCancelSettings = document.getElementById('btn-cancel-settings');
+
+    function openSettings() {
+        settingsModal.classList.add('visible');
+        settingsBackdrop.classList.add('visible');
+        inputApiKey.value = localStorage.getItem('yuvata_groq_key') || '';
+    }
+
+    function closeSettings() {
+        settingsModal.classList.remove('visible');
+        settingsBackdrop.classList.remove('visible');
+    }
+
+    if (btnApiSettings) btnApiSettings.addEventListener('click', openSettings);
+    if (btnCancelSettings) btnCancelSettings.addEventListener('click', closeSettings);
+    if (settingsBackdrop) settingsBackdrop.addEventListener('click', closeSettings);
+    if (btnSaveSettings) {
+        btnSaveSettings.addEventListener('click', () => {
+            const val = inputApiKey.value.trim();
+            if (val) {
+                localStorage.setItem('yuvata_groq_key', val);
+            } else {
+                localStorage.removeItem('yuvata_groq_key');
+            }
+            closeSettings();
+            showToast('API Settings Saved!');
         });
     }
 

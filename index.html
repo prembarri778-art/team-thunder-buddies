@@ -40,6 +40,9 @@
                 <span class="logo-dot"></span>
             </div>
             <div class="nav-actions">
+                <button id="btn-api-settings" class="btn-icon borderless" title="API Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
                 <button class="btn-ghost">Educators</button>
                 <button id="btn-login" class="btn-outline">Login</button>
                 
@@ -263,39 +266,46 @@
                     </div>
                 </div>
 
-                <!-- Action Items / Mentorship -->
-                <div class="result-card action-card">
-                    <h3>Your Next Steps</h3>
-                    <div class="action-list mt-lg">
-                        <div class="action-item">
-                            <div class="action-icon bg-red">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                            </div>
-                            <div class="action-content">
-                                <h4>Weakness: Deepfake Detection</h4>
-                                <p class="text-muted">You struggled distinguishing AI-generated audio from real audio.</p>
-                                <a href="#" class="text-primary mt-sm inline-block">View mini-course &rarr;</a>
-                            </div>
+                <!-- AI Evaluation Report & Roadmap -->
+                <div class="result-card action-card" style="grid-column: span 2; text-align: left;">
+                    <div id="ai-report-loading" class="flex-col-center">
+                        <div class="ai-brain-loader" style="transform: scale(0.5); margin: 0;">
+                            <div class="ring ring-1"></div>
+                            <div class="core"></div>
                         </div>
-                        <div class="action-item">
-                            <div class="action-icon bg-blue">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            </div>
-                            <div class="action-content">
-                                <h4>Weakness: App Permissions</h4>
-                                <p class="text-muted">You allowed location tracking unconditionally in scenario 4.</p>
-                                <a href="#" class="text-primary mt-sm inline-block">Learn about tracking &rarr;</a>
-                            </div>
-                        </div>
+                        <p class="text-muted mt-sm" style="font-size: 0.9rem;">AI Mentor is generating your personalized report...</p>
                     </div>
                     
-                    <button id="btn-open-chat" class="btn-primary w-full mt-lg shine-effect" style="justify-content: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-                        <span>Chat with AI Mentor</span>
-                    </button>
-                    <button class="btn-outline w-full mt-sm" style="justify-content: center; display: flex;">
-                        Export Full Report
-                    </button>
+                    <div id="ai-report-content" style="display: none;">
+                        <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <span>✨</span> AI Mentor Report
+                        </h3>
+                        
+                        <div class="report-section strengths">
+                            <h4 style="color: #34d399; font-size: 0.9rem; margin-bottom: 8px; text-transform: uppercase;">✓ Identified Strengths</h4>
+                            <ul id="report-strengths" style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); font-size: 0.95rem;"></ul>
+                        </div>
+                        
+                        <div class="report-section weaknesses mt-md">
+                            <h4 style="color: #fb7185; font-size: 0.9rem; margin-bottom: 8px; text-transform: uppercase;">⚠ Crucial Blindspots</h4>
+                            <ul id="report-weaknesses" style="list-style: none; padding: 0; margin: 0; color: var(--text-muted); font-size: 0.95rem;"></ul>
+                        </div>
+                        
+                        <div class="report-section roadmap mt-md">
+                            <h4 style="color: var(--primary); font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;">🗺️ Your Learning Roadmap</h4>
+                            <div id="report-roadmap" class="roadmap-timeline"></div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-top: 24px;">
+                            <button id="btn-open-chat" class="btn-primary shine-effect" style="flex: 1; justify-content: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                                <span>Chat with AI Mentor</span>
+                            </button>
+                            <button class="btn-outline" style="flex: 1; justify-content: center; display: flex;">
+                                Export Full Report
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
     </main>
@@ -410,7 +420,26 @@
     </div>
     <div id="history-backdrop" class="history-backdrop"></div>
 
+    <!-- API Settings Modal -->
+    <div id="settings-backdrop" class="auth-backdrop"></div>
+    <div id="settings-modal" class="auth-modal" style="display: flex; flex-direction: column;">
+        <div class="auth-header">
+            <h2 class="section-title" style="font-size: 1.5rem;">⚙️ API Settings</h2>
+            <p class="text-muted mt-sm" style="font-size: 0.9rem; line-height: 1.4;">Provide your own Groq API key to bypass global rate limits. Your key is stored securely in your browser's local storage.</p>
+        </div>
+        <div class="form-group mt-lg">
+            <label class="form-label" for="settings-api-key">Groq API Key</label>
+            <input type="password" class="form-input" id="settings-api-key" placeholder="gsk_...">
+        </div>
+        <div class="flex-row" style="gap: 12px; margin-top: auto; padding-top: 24px;">
+            <button id="btn-cancel-settings" class="btn-outline" style="flex: 1; justify-content: center;">Cancel</button>
+            <button id="btn-save-settings" class="btn-primary shine-effect" style="flex: 1; justify-content: center;">Save Key</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="supabase.js"></script>
+    <script src="ai.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
