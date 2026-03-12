@@ -511,7 +511,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function appendMessage(text, isUser) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-        msgDiv.innerHTML = `<div class="message-bubble">${text}</div>`;
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        bubbleDiv.textContent = text;
+
+        msgDiv.appendChild(bubbleDiv);
         chatMessages.appendChild(msgDiv);
         chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
     }
