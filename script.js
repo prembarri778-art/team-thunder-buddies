@@ -20,10 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 2. Magnetic Buttons ---
     const magneticElements = document.querySelectorAll('.btn-primary, .skill-card, .btn-icon');
     magneticElements.forEach(elem => {
+        let cachedRect = null;
+        let isHovered = false;
+
+        const updateRect = () => {
+            if (isHovered) {
+                cachedRect = elem.getBoundingClientRect();
+            }
+        };
+
+        elem.addEventListener('mouseenter', () => {
+            isHovered = true;
+            cachedRect = elem.getBoundingClientRect();
+            window.addEventListener('scroll', updateRect, { passive: true });
+            window.addEventListener('resize', updateRect, { passive: true });
+        });
+
         elem.addEventListener('mousemove', (e) => {
-            const rect = elem.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
+            if (!cachedRect) return;
+            const x = e.clientX - cachedRect.left - cachedRect.width / 2;
+            const y = e.clientY - cachedRect.top - cachedRect.height / 2;
             // Very light magnetism (max distance 15-20px effect)
             const power = 0.2; 
             
@@ -32,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         elem.addEventListener('mouseleave', () => {
+            isHovered = false;
+            cachedRect = null;
+            window.removeEventListener('scroll', updateRect);
+            window.removeEventListener('resize', updateRect);
             elem.style.transform = 'translate(0px, 0px) scale(1)';
             elem.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
         });

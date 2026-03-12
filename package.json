@@ -1,0 +1,24 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "> *\"Growing up with technology ≠ digital literacy.\"*",
+  "main": "ai.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prembarri778-art/team-thunder-buddies.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/prembarri778-art/team-thunder-buddies/issues"
+  },
+  "homepage": "https://github.com/prembarri778-art/team-thunder-buddies#readme",
+  "dependencies": {
+    "puppeteer": "^24.39.0"
+  }
+}
