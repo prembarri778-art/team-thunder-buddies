@@ -2,6 +2,9 @@
 
 > *"Growing up with technology ≠ digital literacy."*
 
+**🔗 Live Website:** [https://team-thunder-buddies.vercel.app/](https://team-thunder-buddies.vercel.app/)
+
+
 **YUVATA** is an AI-powered digital literacy assessment and mentoring platform designed for youth aged 13–25. It evaluates real-world digital skills — not just tech familiarity — and provides personalized learning roadmaps to bridge skill gaps.
 
 Built for the hackathon problem statement: *Does growing up with technology automatically lead to digital literacy?*
