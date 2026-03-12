@@ -343,22 +343,27 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(report => {
                 // Populate Strengths
                 ulStrengths.innerHTML = '';
+                const strengthsFragment = document.createDocumentFragment();
                 report.strengths.forEach(s => {
                     const li = document.createElement('li');
                     li.textContent = s;
-                    ulStrengths.appendChild(li);
+                    strengthsFragment.appendChild(li);
                 });
+                ulStrengths.appendChild(strengthsFragment);
 
                 // Populate Weaknesses
                 ulWeaknesses.innerHTML = '';
+                const weaknessesFragment = document.createDocumentFragment();
                 report.weaknesses.forEach(w => {
                     const li = document.createElement('li');
                     li.textContent = w;
-                    ulWeaknesses.appendChild(li);
+                    weaknessesFragment.appendChild(li);
                 });
+                ulWeaknesses.appendChild(weaknessesFragment);
 
                 // Populate Roadmap
                 divRoadmap.innerHTML = '';
+                const roadmapFragment = document.createDocumentFragment();
                 report.roadmap.forEach(step => {
                     const stepDiv = document.createElement('div');
                     stepDiv.className = 'roadmap-step';
@@ -366,8 +371,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="roadmap-title">${step.title}</div>
                         <div class="roadmap-desc">${step.desc}</div>
                     `;
-                    divRoadmap.appendChild(stepDiv);
+                    roadmapFragment.appendChild(stepDiv);
                 });
+                divRoadmap.appendChild(roadmapFragment);
 
                 aiReportLoading.style.display = 'none';
                 aiReportContent.style.display = 'block';
