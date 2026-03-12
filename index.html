@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YUVATA | The Real Digital Literacy Test</title>
+    <meta name="description" content="AI-powered digital literacy assessment platform for the new generation.">
+    
+    <!-- Fonts -->
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@300..700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Radar Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Premium Noise Texture -->
+    <div class="noise-overlay"></div>
+
+    <!-- Background Elements -->
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">YUVATA</span>
+                <span class="logo-dot"></span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-ghost">Educators</button>
+                <button class="btn-outline">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <main class="app-container">
+        
+        <!-- View 1: Landing Hero -->
+        <section id="view-hero" class="view active-view flex-col-center text-center">
+            <div class="badge-pill mb-lg">
+                <span class="pulse-dot"></span> Powered by Groq AI
+            </div>
+            
+            <h1 class="hero-title">
+                Scrolling TikTok ≠ <br>
+                <span class="text-gradient">Digital Literacy.</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                Discover your real digital survival skills. An AI-adaptive assessment that spots your blindspots and builds your personalized roadmap. 
+            </p>
+            
+            <div class="hero-actions">
+                <button id="btn-begin" class="btn-primary btn-lg shine-effect">
+                    <span>Start Your Assessment</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <div class="time-estimate">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Takes under 10 minutes
+                </div>
+            </div>
+        </section>
+
+        <!-- View 2: Skill Selection -->
+        <section id="view-skills" class="view hidden-view">
+            <div class="fade-up-header">
+                <button id="btn-back-hero" class="btn-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div>
+                    <h2 class="section-title">Select Your Arsenal</h2>
+                    <p class="section-subtitle">Pick the areas you want to test. Choose at least one.</p>
+                </div>
+            </div>
+
+            <div class="bento-grid mt-xl">
+                
+                <!-- Skill Card 1 -->
+                <button class="skill-card bento-item" data-skill="online-safety">
+                    <div class="skill-icon bg-red">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Online Safety</h3>
+                        <p>Phishing, passwords, and scam detection.</p>
+                    </div>
+                </button>
+
+                <!-- Skill Card 2 -->
+                <button class="skill-card bento-item" data-skill="misinformation">
+                    <div class="skill-icon bg-orange">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Misinformation</h3>
+                        <p>Fact-checking, deepfakes, and media bias.</p>
+                    </div>
+                </button>
+
+                <!-- Skill Card 3 -->
+                <button class="skill-card bento-item" data-skill="privacy">
+                    <div class="skill-icon bg-blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Data Privacy</h3>
+                        <p>App permissions, tracking, and footprint.</p>
+                    </div>
+                </button>
+
+                <!-- Skill Card 4 -->
+                <button class="skill-card bento-item" data-skill="social-media">
+                    <div class="skill-icon bg-pink">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Social Media</h3>
+                        <p>Algorithms, screen time, and cyberbullying.</p>
+                    </div>
+                </button>
+
+                <!-- Skill Card 5 -->
+                <button class="skill-card bento-item" data-skill="search-skills">
+                    <div class="skill-icon bg-teal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Search Mastery</h3>
+                        <p>Advanced operators and source evaluation.</p>
+                    </div>
+                </button>
+
+                <!-- Skill Card 6 -->
+                <button class="skill-card bento-item" data-skill="coding-basics">
+                    <div class="skill-icon bg-purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Tech Basics</h3>
+                        <p>Web fundamentals and AI literacy.</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="bottom-action-bar">
+                <div class="selected-count"><span id="count-display">0</span> Selected</div>
+                <button id="btn-generate" class="btn-primary" disabled>
+                    <span>Generate AI Assessment</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- View 3: AI Loading State (Hidden initially) -->
+        <section id="view-loading" class="view hidden-view flex-col-center text-center">
+            <div class="ai-brain-loader">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+                <div class="core"></div>
+            </div>
+            <h2 class="loading-title mt-xl">Compiling your challenge...</h2>
+            <p id="loading-subtitle" class="loading-subtitle text-muted">Analyzing selected domains</p>
+        </section>
+
+        <!-- View 4: Question Engine -->
+        <section id="view-assessment" class="view hidden-view">
+            <div class="assessment-header">
+                <div class="progress-bar-container">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="assessment-meta">
+                    <span id="question-counter" class="text-muted">Question 1 of 10</span>
+                    <span class="badge-pill bg-purple-subtle" id="current-skill-badge">Online Safety</span>
+                </div>
+            </div>
+
+            <div class="question-container mt-xl">
+                <h2 id="question-text" class="question-text">Loading question...</h2>
+                <p id="question-context" class="question-context text-muted">Select the best answer to proceed.</p>
+                
+                <div id="options-container" class="options-grid mt-lg">
+                    <!-- Options will be injected here via JS -->
+                </div>
+            </div>
+
+            <div class="bottom-action-bar visible" id="assessment-action-bar" style="display: none;">
+                <button id="btn-next-question" class="btn-primary" disabled>
+                    <span>Next Question</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- View 5: Results Dashboard -->
+        <section id="view-results" class="view hidden-view">
+            <div class="results-header text-center">
+                <div class="level-badge-container mb-lg">
+                    <div class="level-badge shine-effect" id="final-level-badge">
+                        <span class="level-icon">🛡️</span>
+                        <h3 id="final-level-text">Digital Native</h3>
+                    </div>
+                </div>
+                <h2 class="section-title">Assessment Complete.</h2>
+                <p class="section-subtitle">Here is your digital literacy profile and performance breakdown.</p>
+            </div>
+
+            <div class="results-grid mt-xl">
+                <!-- Score Card -->
+                <div class="result-card score-card flex-col-center">
+                    <div class="circular-progress" data-progress="85">
+                        <div class="inner-circle">
+                            <span id="final-score" class="score-value">85%</span>
+                        </div>
+                    </div>
+                    <h3 class="mt-lg">Overall Score</h3>
+                    <p class="text-muted text-center mt-sm">You scored higher than 72% of users.</p>
+                </div>
+
+                <!-- Radar Chart Card -->
+                <div class="result-card chart-card">
+                    <h3>Skill Breakdown</h3>
+                    <div class="chart-container mt-lg">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Action Items / Mentorship -->
+                <div class="result-card action-card">
+                    <h3>Your Next Steps</h3>
+                    <div class="action-list mt-lg">
+                        <div class="action-item">
+                            <div class="action-icon bg-red">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                            </div>
+                            <div class="action-content">
+                                <h4>Weakness: Deepfake Detection</h4>
+                                <p class="text-muted">You struggled distinguishing AI-generated audio from real audio.</p>
+                                <a href="#" class="text-primary mt-sm inline-block">View mini-course &rarr;</a>
+                            </div>
+                        </div>
+                        <div class="action-item">
+                            <div class="action-icon bg-blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <div class="action-content">
+                                <h4>Weakness: App Permissions</h4>
+                                <p class="text-muted">You allowed location tracking unconditionally in scenario 4.</p>
+                                <a href="#" class="text-primary mt-sm inline-block">Learn about tracking &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="btn-open-chat" class="btn-primary w-full mt-lg shine-effect" style="justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                        <span>Chat with AI Mentor</span>
+                    </button>
+                    <button class="btn-outline w-full mt-sm" style="justify-content: center; display: flex;">
+                        Export Full Report
+                    </button>
+                </div>
+            </div>
+    </main>
+
+    <!-- AI Mentor Chat Drawer -->
+    <div id="chat-drawer" class="chat-drawer">
+        <div class="chat-header">
+            <div class="chat-title-group">
+                <div class="ai-avatar shine-effect">
+                    <span class="ai-icon">✨</span>
+                </div>
+                <div>
+                    <h3 class="chat-name">YUVATA Coach</h3>
+                    <div class="chat-status text-muted">Online & Ready</div>
+                </div>
+            </div>
+            <button id="btn-close-chat" class="btn-icon borderless">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages">
+            <!-- Messages go here -->
+            <div class="message ai-message">
+                <div class="message-bubble">
+                    Hi! I see you struggled with Deepfake Detection. Want me to walk you through how to spot edited audio, or do you have any other questions about your score?
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask your digital coach anything...">
+            <button id="btn-send-message" class="btn-send">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Backdrop for Drawer -->
+    <div id="chat-backdrop" class="chat-backdrop"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
