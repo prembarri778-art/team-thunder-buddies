@@ -2,11 +2,30 @@ const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_API_KEY = "YOUR_GROQ_API_KEY_HERE";
 const MODEL = "llama-3.1-8b-instant";
 
+let cachedApiKey = null;
+
 function getApiKey() {
-    return localStorage.getItem('yuvata_groq_key') || DEFAULT_API_KEY;
+    if (cachedApiKey === null) {
+        cachedApiKey = localStorage.getItem('yuvata_groq_key') || DEFAULT_API_KEY;
+    }
+    return cachedApiKey;
 }
 
+// Listen for storage events to update cache if key is changed in another tab
+window.addEventListener('storage', (e) => {
+    if (e.key === 'yuvata_groq_key') {
+        cachedApiKey = e.newValue || DEFAULT_API_KEY;
+    }
+});
+
 const YuvataAI = {
+    /**
+     * Updates the in-memory cached API key without triggering localStorage I/O.
+     */
+    updateApiKeyCache(newKey) {
+        cachedApiKey = newKey || DEFAULT_API_KEY;
+    },
+
     /**
      * Generates a set of unique scenario-based questions based on selected skills.
      */

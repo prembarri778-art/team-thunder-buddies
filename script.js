@@ -592,8 +592,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = inputApiKey.value.trim();
             if (val) {
                 localStorage.setItem('yuvata_groq_key', val);
+                if (typeof YuvataAI !== 'undefined' && YuvataAI.updateApiKeyCache) {
+                    YuvataAI.updateApiKeyCache(val);
+                }
             } else {
                 localStorage.removeItem('yuvata_groq_key');
+                if (typeof YuvataAI !== 'undefined' && YuvataAI.updateApiKeyCache) {
+                    YuvataAI.updateApiKeyCache(null);
+                }
             }
             closeSettings();
             showToast('API Settings Saved!');
