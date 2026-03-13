@@ -50,6 +50,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </button>
                 <button id="btn-leaderboard" class="btn-ghost" title="Weekly Leaderboard">🏆 Leaderboard</button>
+                <button id="btn-challenges" class="btn-ghost">🎯 Challenges</button>
                 <button id="btn-campaign" class="btn-ghost">🚀 Campaign Hub</button>
                 <button class="btn-ghost">Educators</button>
                 <button id="btn-login" class="btn-outline">Login</button>
@@ -303,6 +304,57 @@
             </div>
         </section>
 
+        <!-- View: Challenges Hub -->
+        <section id="view-challenges" class="view hidden-view">
+            <div class="fade-up-header">
+                <button id="btn-back-hero-challenges" class="btn-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div>
+                    <h2 class="section-title">Challenges Hub</h2>
+                    <p class="section-subtitle">Pick a specialized challenge and climb the leaderboard.</p>
+                </div>
+            </div>
+
+            <div class="bento-grid mt-xl">
+                <!-- Challenge 1 -->
+                <div class="skill-card bento-item challenge-card" data-challenge="weekly">
+                    <div class="skill-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3);">
+                        <span>🔥</span>
+                    </div>
+                    <div class="skill-content">
+                        <h3>The Weekly Mega-Challenge</h3>
+                        <p>Test all 6 core domains in one high-stakes assessment.</p>
+                        <button class="btn-outline btn-sm mt-md start-challenge-btn" data-challenge-type="weekly">Start Challenge</button>
+                    </div>
+                </div>
+
+                <!-- Challenge 2 -->
+                <div class="skill-card bento-item challenge-card" data-challenge="security">
+                    <div class="skill-icon" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3);">
+                        <span>🛡️</span>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Security Sprint</h3>
+                        <p>Focus on Online Safety, Privacy, and Tech Basics.</p>
+                        <button class="btn-outline btn-sm mt-md start-challenge-btn" data-challenge-type="security">Start Session</button>
+                    </div>
+                </div>
+
+                <!-- Challenge 3 -->
+                <div class="skill-card bento-item challenge-card" data-challenge="media">
+                    <div class="skill-icon" style="background: rgba(45, 212, 191, 0.15); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.3);">
+                        <span>📰</span>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Media Guru</h3>
+                        <p>Focus on Misinformation, Search Skills, and Social Media.</p>
+                        <button class="btn-outline btn-sm mt-md start-challenge-btn" data-challenge-type="media">Start Session</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- View 3: AI Loading State (Hidden initially) -->
         <section id="view-loading" class="view hidden-view flex-col-center text-center">
             <div class="ai-brain-loader">
@@ -371,6 +423,7 @@
                 <!-- Radar Chart Card -->
                 <div class="result-card chart-card">
                     <h3>Skill Breakdown</h3>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">Tested: <span id="results-domains" style="color: var(--primary);"></span></p>
                     <div class="chart-container mt-lg">
                         <canvas id="radarChart"></canvas>
                     </div>

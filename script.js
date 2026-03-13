@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = {
         hero: document.getElementById('view-hero'),
         skills: document.getElementById('view-skills'),
+        challenges: document.getElementById('view-challenges'),
         loading: document.getElementById('view-loading'),
         assessment: document.getElementById('view-assessment'),
         results: document.getElementById('view-results')
@@ -213,6 +214,63 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomBar.classList.remove('visible');
     });
 
+    // --- Challenges Hub Navigation ---
+    const btnChallenges = document.getElementById('btn-challenges');
+    const btnBackHeroChallenges = document.getElementById('btn-back-hero-challenges');
+
+    if (btnChallenges) {
+        btnChallenges.addEventListener('click', () => {
+            isWeeklyChallengeActive = false;
+            if (landingSections) landingSections.style.display = 'none';
+            switchView(views.hero, views.challenges);
+        });
+    }
+
+    if (btnBackHeroChallenges) {
+        btnBackHeroChallenges.addEventListener('click', () => {
+            switchView(views.challenges, views.hero);
+            if (landingSections) landingSections.style.display = 'block';
+        });
+    }
+
+    // Handle individual challenge starts
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('start-challenge-btn')) {
+            const type = e.target.dataset.challengeType;
+            startSpecializedChallenge(type);
+        }
+    });
+
+    function startSpecializedChallenge(type) {
+        isWeeklyChallengeActive = (type === 'weekly');
+        selectedSkills.clear();
+        
+        switch(type) {
+            case 'weekly':
+                document.querySelectorAll('.skill-card').forEach(card => selectedSkills.add(card.dataset.skill));
+                break;
+            case 'security':
+                selectedSkills.add('online-safety');
+                selectedSkills.add('privacy');
+                selectedSkills.add('coding-basics');
+                break;
+            case 'media':
+                selectedSkills.add('misinformation');
+                selectedSkills.add('search-skills');
+                selectedSkills.add('social-media');
+                break;
+        }
+
+        // Highlight selected cards in the skills view (hidden) just to keep state sync
+        document.querySelectorAll('.skill-card').forEach(card => {
+            if (selectedSkills.has(card.dataset.skill)) card.classList.add('selected');
+            else card.classList.remove('selected');
+        });
+
+        checkSelection();
+        btns.generate.click();
+    }
+
     // --- 6. Skill Selection Logic ---
     skillCards.forEach(card => {
         card.addEventListener('click', () => {
@@ -280,6 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
         bottomBar.classList.remove('visible');
         if (isWeeklyChallengeActive) {
              switchView(views.hero, views.loading);
+        } else if (!views.challenges.classList.contains('hidden-view')) {
+             switchView(views.challenges, views.loading);
         } else {
              switchView(views.skills, views.loading);
         }
@@ -368,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         userAnswers.push({
             skill: qObj.skillCategory,
+            question: qObj.q,
             isCorrect: isCorrect
         });
 
@@ -449,7 +510,10 @@ document.addEventListener('DOMContentLoaded', () => {
         initRadarChart(skillScores);
 
         // Update selected domains text on results
-        document.getElementById('results-domains').textContent = Array.from(selectedSkills).join(', ');
+        const domainsEl = document.getElementById('results-domains');
+        if (domainsEl) {
+            domainsEl.textContent = Array.from(selectedSkills).join(', ');
+        }
 
         // --- GROQ AI: Generate Report and Roadmap ---
         const aiReportLoading = document.getElementById('ai-report-loading');

@@ -480,6 +480,32 @@ button:focus-visible {
     font-size: 0.875rem;
 }
 
+/* Challenge Hub Specifics */
+.challenge-card {
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.start-challenge-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.start-challenge-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 15px var(--primary-glow);
+}
+
+.challenge-card:hover .skill-icon {
+    transform: scale(1.1) rotate(5deg);
+    transition: transform 0.3s ease;
+}
+
 .bottom-action-bar {
     position: fixed;
     bottom: 24px; left: 50%;
