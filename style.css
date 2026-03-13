@@ -1114,6 +1114,9 @@ button:focus-visible {
     padding: 4px;
     margin-bottom: 24px;
     border: 1px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .auth-tab {
@@ -1124,12 +1127,26 @@ button:focus-visible {
     font-size: 0.9rem;
     font-weight: 500;
     transition: all 0.25s ease;
+    /* Override any global button styles that inflate the tab */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: none !important;
+    transform: none !important;
+    background: none;
+    border: none;
+    margin: 0;
+    line-height: 1.2;
+    min-height: unset;
+    height: auto;
 }
 
 .auth-tab.active {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 4px 12px var(--primary-glow);
+    background: var(--primary) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px var(--primary-glow) !important;
+    transform: none !important;
 }
 
 .auth-tab:not(.active):hover {

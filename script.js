@@ -18,8 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(raf);
 
     // --- 2. Magnetic Buttons ---
-    const magneticElements = document.querySelectorAll('.btn-primary, .skill-card, .btn-icon');
+    // Exclude auth modal buttons and tabs from the magnetic effect
+    const magneticElements = document.querySelectorAll('.btn-primary:not(.auth-modal .btn-primary), .skill-card, .btn-icon:not(.auth-modal .btn-icon):not(.auth-close-btn)');
     magneticElements.forEach(elem => {
+        // Skip if inside auth-modal or is an auth-tab
+        if (elem.closest('.auth-modal') || elem.classList.contains('auth-tab')) return;
+
         elem.addEventListener('mousemove', (e) => {
             const rect = elem.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
@@ -929,7 +933,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeAuthModal();
                 showToast('Welcome back! 🎉');
             } catch (err) {
-                authErrorLogin.textContent = err.message || 'Sign in failed. Please try again.';
+                let msg = err.message || 'Sign in failed. Please try again.';
+                if (msg.toLowerCase().includes('invalid login credentials') || msg.toLowerCase().includes('invalid credentials')) {
+                    msg = 'Invalid email or password. Please check and try again.';
+                } else if (msg.toLowerCase().includes('email not confirmed')) {
+                    msg = 'Please check your email and confirm your account first.';
+                } else if (msg.toLowerCase().includes('rate limit')) {
+                    msg = 'Too many attempts. Please wait a few minutes and try again.';
+                }
+                authErrorLogin.textContent = msg;
             } finally {
                 submitBtn.textContent = originalText;
             }
@@ -953,7 +965,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeAuthModal();
                 showToast('Account created! Welcome to YUVATA 🚀');
             } catch (err) {
-                authErrorSignup.textContent = err.message || 'Sign up failed. Please try again.';
+                let msg = err.message || 'Sign up failed. Please try again.';
+                if (msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('email rate limit')) {
+                    msg = '⚠️ Email rate limit reached. Please wait 15 mins, use a different email, or contact the organizers.';
+                } else if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('user already exists')) {
+                    msg = 'This email is already registered. Please login instead.';
+                } else if (msg.toLowerCase().includes('password')) {
+                    msg = 'Password must be at least 6 characters.';
+                }
+                authErrorSignup.textContent = msg;
             } finally {
                 submitBtn.textContent = originalText;
             }
